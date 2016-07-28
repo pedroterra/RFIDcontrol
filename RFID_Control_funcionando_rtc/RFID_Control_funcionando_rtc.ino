@@ -1,14 +1,23 @@
+//
+/*
+this code was based on the following: MFRC522 library ReadNuid Exemple by miguel balboa ( https://github.com/miguelbalboa/rfid)
+also exemples from DS1307RTC library for arduino
 
+Wire diagram:
+
+
+
+*/
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Wire.h>
 #include <Time.h>
 #include <DS1307RTC.h>
 
-
 #define RST_PIN         9           // Configurable, see typical pin layout above
 #define SS_PIN          10
 #define RELAY1  7// Configurable, see typical pin layout above
+
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance.
 
@@ -34,6 +43,7 @@ void setup() {
   mfrc522.PCD_Init();         // Init MFRC522 card
   Serial.println(F("RFID Control"));
   Serial.println("by Pedro Terra V1.0");
+  Serial.println("For www.oficinaLAb.com.br");
   Serial.println("");
 
 }
@@ -50,7 +60,6 @@ void loop() {
 
   // Show some details of the PICC (that is: the tag/card)
   Serial.print(F("Card UID:"));
-
   dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
   Serial.println(DataString);
 
@@ -78,9 +87,10 @@ void loop() {
   if (OpenDoor == true) {
     Serial.println("Acesso Liberado");
     Serial.println("Solenide on");
-    digitalWrite(6, HIGH);
-    digitalWrite(RELAY1, 0);
-
+    digitalWrite(6, HIGH); //green led on
+    digitalWrite(RELAY1, 0);// relay on
+    
+    //get time:
     tmElements_t tm;
     if (RTC.read(tm)) {
       Serial.print("Time: ");
@@ -106,25 +116,20 @@ void loop() {
         Serial.println();
       }
     }
-     delay(1000);
-    digitalWrite(RELAY1, 1);
-    digitalWrite(6, LOW);
-
-    OpenDoor = false;
+    delay(1000); //wait 1 seccond before green led off
+    digitalWrite(RELAY1, 1);//realy ofd
+    digitalWrite(6, LOW);// green led off
+    // reset system
+    OpenDoor = false; 
     Serial.println("");
-
-    DataString = "";
-
+    DataString = "";//clear DataString
     delay(2000);
 
   }
 }
 
-
-
-/*
-   Helper routine to dump a byte array as hex values to Serial.
-*/
+//Helper routine to dump a byte array as hex values to Serial.
+//set card number to datastring
 void dump_byte_array(byte *buffer, byte bufferSize) {
   for (byte i = 0; i < 4; i++) {
 
